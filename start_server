@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+source ./env/bin/activate
+nohup gunicorn -b 0.0.0.0:5000 --access-logfile ./access.log sendmail:APP &
+

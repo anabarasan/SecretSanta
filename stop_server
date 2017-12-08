@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+for pid in $(pgrep gunicorn); do sudo kill -9 $pid; done
+
