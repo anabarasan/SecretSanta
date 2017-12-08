@@ -3,43 +3,11 @@ import random
 import ssl
 import urllib2
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from smtplib import SMTP
-
 from flask import Flask, request, render_template, url_for
-
-SMTP_SERVER = "smtp.office365.com"
-SMTP_SERVER_PORT = 587
-USERNAME = ""
-PASSWORD = ""
-FROM_ADDR = ""
-SUBJECT = "Your Mom has sent you a Task"
 
 HOSTNAME = ""
 MATTERMOST_HOST = ""
 WEBHOOK = ""
-
-def construct_mail_message(from_addr, to_addr, subject, text):
-    """construct mail message"""
-    msg = MIMEMultipart()
-    msg['From'] = from_addr
-    msg['To'] = to_addr
-    msg['Subject'] = subject
-    msg.attach(MIMEText(text, 'html'))
-    return msg
-
-def send_mail(smtp_server, smtp_server_port, username, password,
-              from_addr, to_addr, subject, text):
-    """ send email """
-    message = construct_mail_message(from_addr, to_addr, subject, text)
-    server = SMTP(smtp_server, smtp_server_port)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    server.login(username, password)
-    server.sendmail(from_addr, to_addr, message.as_string())
-    server.quit()
 
 def post_to_mattermost(channel, message):
     webhook = MATTERMOST_HOST + WEBHOOK
