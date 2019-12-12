@@ -9,35 +9,29 @@ from requests.exceptions import HTTPError
 from sqlalchemy import and_
 
 from secretsanta import app, db
-from secretsanta.forms import LoginForm, RegistrationForm, ChildSelectForm, MessageForm
+from secretsanta.forms import LoginForm, RegistrationForm, ChildSelectForm, MessageForm, ChangePasswordForm
 from secretsanta.models import User
 
 
-MESSAGE = '''{}
-
-with love,
-
-Mom'''
-
-WALLPAPERS = [                                                                                                                                
-    'christmas_12.jpg',                                                                                                                       
-    'Christmas-Cookies-Full.jpg',                                                                                                             
-    'Christmas-Cookies.jpg',                                                                                                                  
-    'Christmas-Decoration-Patterb.jpg',                                                                                                       
-    'Christmas-Decorations.jpg',                                                                                                              
-    'Christmas-Lights.jpg',                                                                                                                   
-    'Christmas-tree.jpg',                                                                                                                     
-    'Firefox.png',                                                                                                                            
-    'game-of-thrones.jpg',                                                                                                                    
-    'golden-christmas-stars.jpg',                                                                                                             
-    'merry_christmas.jpg',                                                                                                                    
-    'red-christmas.jpg',                                                                                                
-    'santa-claus-flying.jpg',                                                                                           
-    'small-christmas-house.jpg',                                                                                        
-    'StarWars.jpg',                                                                                                     
-    'superheroes-christmas.jpg',                                                                                        
-    'tangle-of-christmas-lights.jpg',                                                                                   
+WALLPAPERS = [
+    'christmas_12.jpg',
+    'Christmas-Cookies-Full.jpg',
+    'Christmas-Cookies.jpg',
+    'Christmas-Decoration-Patterb.jpg',
+    'Christmas-Decorations.jpg',
+    'Christmas-Lights.jpg',
+    'Firefox.png',
+    'game-of-thrones.jpg',
+    'golden-christmas-stars.jpg',
+    'merry_christmas.jpg',
+    'red-christmas.jpg',
+    'santa-claus-flying.jpg',
+    'small-christmas-house.jpg',
+    'StarWars.jpg',
+    'superheroes-christmas.jpg',
+    'tangle-of-christmas-lights.jpg',
 ]
+
 
 def get_wallpaper_filename():
     filename = random.choice(WALLPAPERS)
@@ -155,6 +149,34 @@ def configure_child():
             db.session.commit()
             return redirect(url_for('index'))
         return render_template('addchild.html', title='Select Child', form=form, user=me, wallpaper=get_wallpaper_filename())
+    except Exception as err:
+        app.logger.error("Something happened!")
+        app.logger.exception(err)
+        raise
+
+@app.route('/changepassword', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    try:
+        form = ChangePasswordForm()
+        # app.logger.info("***** %s ******", form.validate_on_submit())
+        if form.validate_on_submit():
+            app.logger.info('changing password for %s', current_user.username)
+            me = User.query.filter_by(username=current_user.username).first()
+            password = form.password.data
+            new_password = form.new_password.data
+            if me.check_password(password):
+                app.logger.info('current password verified for %s', current_user.username)
+                me.set_password(new_password)
+                db.session.add(me)
+                db.session.commit()
+                app.logger.info('successfully changed the password for %s', current_user.username)
+                return redirect(url_for('index'))
+            else:
+                app.logger.error('existing password does not match for %s', current_user.username)
+                error = "Please enter the correct current password"
+                render_template('changepassword.html', title='Change Password', form=form, wallpaper=get_wallpaper_filename(), error=error)
+        return render_template('changepassword.html', title='Change Password', form=form, wallpaper=get_wallpaper_filename())
     except Exception as err:
         app.logger.error("Something happened!")
         app.logger.exception(err)
