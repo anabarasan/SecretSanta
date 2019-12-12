@@ -1,23 +1,22 @@
 # SecretSanta
 
-use the web page or the cli.
+configure the MS TEAMS WEBHOOK to post to.
 
-configure the MATTERMOST SERVER URL WEBHOOK and CHANNEL NAME to post to.
+### for development
 
-cli syntax
+set FLASK APP env var
+
+```export FLASK_APP=secretsanta.py```
+
+initialize the database and create the tables
 
 ```
-$ cli/secretsanta -h
-usage: secretsanta [-h] -@ MENTION -m MESSAGE
+$ flask db upgrade
+```
 
-optional arguments:
-  -h, --help            show this help message and exit
+start the server
 
-required arguments:
-  -@ MENTION, --mention MENTION
-                        which user to tag in the message
-  -m MESSAGE, --message MESSAGE
-                        The message you want to pass alonguse double quotes
-                        for multi line
+```
+$ flask run
 ```
 
