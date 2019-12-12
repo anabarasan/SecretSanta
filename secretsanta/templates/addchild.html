@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Who's your Child</h1>
+  <form action="" method="post" novalidate {% if user.child.username %}style="display:none;"{% endif %}>
+    {{ form.hidden_tag() }}
+    <p>
+      <!-- {{ form.child.label }}<br> -->
+      {{ form.child() }}<br>
+      {% for error in form.child.errors %}
+      <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+  </form>
+  <div>
+    Configured Child => {{ user.child.username }}<br/>
+    To reset contact admin via your messaging service
+  </div>
+{% endblock %}
